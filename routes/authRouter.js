@@ -6,4 +6,6 @@ authRouter.post("/local/signup", authController.local_signup);
 
 authRouter.post("/local/login", authController.local_login);
 
+authRouter.post("/refreshToken", authController.refreshToken);
+
 module.exports = authRouter;

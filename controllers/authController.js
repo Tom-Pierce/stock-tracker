@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const User = require("../models/User");
 const { body, validationResult } = require("express-validator");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
@@ -97,7 +97,7 @@ exports.local_login = (req, res, next) => {
     if (err) return next(err);
     if (!user) return res.status(401).send(info);
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: maxAge,
+      expiresIn: 5,
     });
 
     res
@@ -108,4 +108,40 @@ exports.local_login = (req, res, next) => {
       })
       .sendStatus(200);
   })(req, res, next);
+};
+
+exports.refreshToken = (req, res, next) => {
+  const refreshToken = req.cookies.refreshToken;
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      try {
+        if (err) {
+          return res.status(401).json({
+            message: "Authentication failed: Invalid token",
+          });
+        }
+        const user = await User.findById(decoded._id);
+        if (!user || user.refreshToken !== refreshToken) {
+          throw new Error("Authentication failed: Invalid token");
+        }
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: maxAge,
+        });
+
+        res
+          .cookie("jwt", token, {
+            withCredentials: true,
+            httpOnly: true,
+            maxAge: maxAge * 1000,
+          })
+          .sendStatus(200);
+      } catch (err) {
+        return res.status(401).json({
+          message: "Authentication failed: Invalid token",
+        });
+      }
+    }
+  );
 };
