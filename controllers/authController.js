@@ -3,6 +3,7 @@ const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const maxAge = 60 * 60;
 
 exports.local_signup = [
   body("email")
@@ -72,7 +73,6 @@ exports.local_signup = [
         });
 
         await user.save();
-        const maxAge = 60 * 60;
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
           expiresIn: maxAge,
         });
@@ -96,9 +96,8 @@ exports.local_login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
     if (!user) return res.status(401).send(info);
-    const maxAge = 60 * 60;
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: 15,
+      expiresIn: maxAge,
     });
 
     res
