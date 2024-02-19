@@ -1,13 +1,22 @@
 const createError = require("http-errors");
 const express = require("express");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-require("dotenv").config;
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const indexRouter = require("./routes");
 
 const app = express();
+
+main().catch((err) => console.log(err));
+
+async function main() {
+  const mongoDB =
+    process.env.NODE_ENV === "test" ? undefined : process.env.MONGODB_URI;
+
+  await mongoose.connect(mongoDB);
+}
 
 app.use(logger("dev"));
 app.use(express.json());
