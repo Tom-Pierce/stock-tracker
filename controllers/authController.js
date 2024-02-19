@@ -98,7 +98,7 @@ exports.local_login = (req, res, next) => {
     if (!user) return res.status(401).send(info);
     const maxAge = 60 * 60;
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: maxAge,
+      expiresIn: 15,
     });
 
     res
