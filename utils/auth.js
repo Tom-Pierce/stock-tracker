@@ -29,12 +29,3 @@ passport.use(
     }
   )
 );
-
-passport.serializeUser((user, done) => {
-  done(null, user._id);
-});
-
-passport.deserializeUser(async (userId, done) => {
-  const user = await User.findOne({ _id: userId }).exec();
-  done(null, user);
-});
