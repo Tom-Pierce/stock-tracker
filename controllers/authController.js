@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 exports.local_signup = [
   body("email")
@@ -71,10 +72,41 @@ exports.local_signup = [
         });
 
         await user.save();
-        res.status(201).json({ message: "user created" });
+        const maxAge = 60 * 60;
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: maxAge,
+        });
+
+        res
+          .cookie("jwt", token, {
+            withCredentials: true,
+            httpOnly: true,
+            maxAge: maxAge * 1000,
+          })
+          .status(201)
+          .json({ message: "user created" });
       });
     } catch (error) {
       return next(error);
     }
   },
 ];
+
+exports.local_login = (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).send(info);
+    const maxAge = 60 * 60;
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: maxAge,
+    });
+
+    res
+      .cookie("jwt", token, {
+        withCredentials: true,
+        httpOnly: true,
+        maxAge: maxAge * 1000,
+      })
+      .sendStatus(200);
+  })(req, res, next);
+};
