@@ -5,6 +5,7 @@ const User = require("../models/User");
 exports.position_post = [
   body("ticker")
     .trim()
+    .isString()
     // validate that the stock exists
     .custom(async (ticker) => {
       // return bool to avoid error being caught in trycatch block
@@ -29,6 +30,7 @@ exports.position_post = [
     .escape(),
 
   async (req, res, next) => {
+    req.body.ticker = req.body.ticker.toUpperCase();
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errArr = errors.errors.map((error) => {
@@ -39,7 +41,23 @@ exports.position_post = [
     }
 
     try {
-      const position = new Position({ ticker: req.body.ticker });
+      const isDuplicate = await Position.findOne({
+        user: req.user.id,
+        ticker: req.body.ticker,
+      }).exec();
+
+      if (isDuplicate) {
+        return res
+          .status(409)
+          .json({
+            message: "Cannot create duplicate positions of the same stock",
+          });
+      }
+
+      const position = new Position({
+        ticker: req.body.ticker,
+        user: req.user.id,
+      });
       await position.save();
 
       await User.findByIdAndUpdate(req.user.id, {

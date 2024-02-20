@@ -44,4 +44,18 @@ describe("Positions tests", () => {
       expect.stringContaining("Please provide a valid stock ticker")
     );
   });
+
+  it("should respond 409 if a duplicate ticker is sent", async () => {
+    const res = await request(app)
+      .post("/api/portfolio/position")
+      .send({
+        ticker: "rklb",
+      })
+      .set("Cookie", cookies);
+
+    expect(res.status).toEqual(409);
+    expect(res.body.message).toEqual(
+      "Cannot create duplicate positions of the same stock"
+    );
+  });
 });
