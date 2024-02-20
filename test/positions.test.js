@@ -69,9 +69,25 @@ describe("Positions tests", () => {
     expect(res.body.positions[0]).toMatchObject({
       ticker: "RKLB",
       lots: [],
+      value: 0,
       cost: 0,
     });
     expect(res.body.positions.length).toEqual(1);
+  });
+
+  it("should respond with the position data of ticker", async () => {
+    const res = await request(app)
+      .get("/api/portfolio/position/rklb")
+      .set("Cookie", cookies);
+
+    console.log(res.body);
+    expect(res.status).toEqual(200);
+    expect(res.body.position).toMatchObject({
+      ticker: "RKLB",
+      lots: [],
+      value: 0,
+      cost: 0,
+    });
   });
 
   it("should respond with 404 if position does not exist", async () => {

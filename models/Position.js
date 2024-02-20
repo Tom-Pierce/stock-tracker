@@ -1,19 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const positionSchema = new Schema({
-  ticker: { type: String, required: true },
-  lots: [
-    {
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true },
-      _id: false,
-    },
-  ],
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-});
+const positionSchema = new Schema(
+  {
+    ticker: { type: String, required: true },
+    lots: [
+      {
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        _id: false,
+      },
+    ],
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  },
+  { toObject: { virtuals: true, getters: true } }
+);
 
-// value of each seperate lot
+// cost of each seperate lot
 positionSchema
   .path("lots")
   .schema.virtual("cost")
@@ -21,7 +24,7 @@ positionSchema
     return this.quantity * this.price;
   });
 
-// value of position
+// cost of position
 positionSchema.virtual("cost").get(function () {
   let totalCost = 0;
   this.lots.forEach((lot) => {
@@ -38,7 +41,5 @@ positionSchema.virtual("quantity").get(function () {
   });
   return quantity;
 });
-
-positionSchema.set("toJSON", { virtuals: true });
 
 module.exports = mongoose.model("Position", positionSchema);

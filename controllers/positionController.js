@@ -5,7 +5,25 @@ const User = require("../models/User");
 exports.positions_get = async (req, res, next) => {
   try {
     const positions = await Position.find({ user: req.user.id }).exec();
-    res.status(200).json({ positions });
+
+    const valuedPositions = await Promise.all(
+      positions.map(async (position) => {
+        const stockRes = await fetch(
+          `https://finnhub.io/api/v1/quote?symbol=${position.ticker}&token=${process.env.API_KEY}`,
+          { method: "GET" }
+        );
+
+        const stockData = await stockRes.json();
+
+        return {
+          ...position.toObject(),
+          value: stockData.c * position.quantity,
+          currentPrice: stockData.c,
+        };
+      })
+    );
+
+    res.status(200).json({ positions: valuedPositions });
   } catch (err) {
     return next(err);
   }
@@ -25,14 +43,20 @@ exports.position_get = async (req, res, next) => {
         .json({ message: "User does not have a position for that stock" });
     }
 
-    const res = await fetch(
+    const stockRes = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${req.params.ticker}&token=${process.env.API_KEY}`,
       { method: "GET" }
     );
 
-    const stockData = await res.json();
+    const stockData = await stockRes.json();
 
-    res.status(200).json({ position });
+    res.status(200).send({
+      position: {
+        ...position.toObject(),
+        value: stockData.c * position.quantity,
+        currentPrice: stockData.c,
+      },
+    });
   } catch (err) {
     return next(err);
   }
