@@ -21,7 +21,7 @@ positionSchema
     return this.quantity * this.price;
   });
 
-//value of position
+// value of position
 positionSchema.virtual("cost").get(function () {
   let totalCost = 0;
   this.lots.forEach((lot) => {

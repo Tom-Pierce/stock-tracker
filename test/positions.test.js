@@ -69,7 +69,7 @@ describe("Positions tests", () => {
     expect(res.body.positions[0]).toMatchObject({
       ticker: "RKLB",
       lots: [],
-      value: 0,
+      cost: 0,
     });
     expect(res.body.positions.length).toEqual(1);
   });
