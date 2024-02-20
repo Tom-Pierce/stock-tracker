@@ -47,11 +47,9 @@ exports.position_post = [
       }).exec();
 
       if (isDuplicate) {
-        return res
-          .status(409)
-          .json({
-            message: "Cannot create duplicate positions of the same stock",
-          });
+        return res.status(409).json({
+          message: "Cannot create duplicate positions of the same stock",
+        });
       }
 
       const position = new Position({
