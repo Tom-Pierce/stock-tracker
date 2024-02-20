@@ -13,9 +13,12 @@ const positionSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 });
 
-positionSchema.virtual("lots.value").get(function () {
-  return this.quantity * this.price;
-});
+positionSchema
+  .path("lots")
+  .schema.virtual("value")
+  .get(function () {
+    return this.quantity * this.price;
+  });
 
 positionSchema.set("toJSON", { virtuals: true });
 
