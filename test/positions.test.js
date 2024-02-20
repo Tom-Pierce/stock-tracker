@@ -59,4 +59,29 @@ describe("Positions tests", () => {
       "Cannot create duplicate positions of the same stock"
     );
   });
+
+  it("should respond with the position data of all tickers", async () => {
+    const res = await request(app)
+      .get("/api/portfolio/position")
+      .set("Cookie", cookies);
+
+    expect(res.status).toEqual(200);
+    expect(res.body.positions[0]).toMatchObject({
+      ticker: "RKLB",
+      lots: [],
+      value: 0,
+    });
+    expect(res.body.positions.length).toEqual(1);
+  });
+
+  it("should respond with 404 if position does not exist", async () => {
+    const res = await request(app)
+      .get("/api/portfolio/position/aapl")
+      .set("Cookie", cookies);
+
+    expect(res.status).toEqual(404);
+    expect(res.body.message).toEqual(
+      "User does not have a position for that stock"
+    );
+  });
 });

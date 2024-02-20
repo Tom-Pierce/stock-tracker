@@ -10,6 +10,14 @@ portfolioRouter.post(
   lotController.lot_post
 );
 
+portfolioRouter.get(
+  "/position/:ticker",
+  verifyToken,
+  positionController.position_get
+);
+
+portfolioRouter.get("/position", verifyToken, positionController.positions_get);
+
 portfolioRouter.post(
   "/position",
   verifyToken,

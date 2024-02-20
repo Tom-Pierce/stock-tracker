@@ -2,6 +2,35 @@ const { body, validationResult } = require("express-validator");
 const Position = require("../models/Position");
 const User = require("../models/User");
 
+exports.positions_get = async (req, res, next) => {
+  try {
+    const positions = await Position.find({ user: req.user.id }).exec();
+    res.status(200).json({ positions });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.position_get = async (req, res, next) => {
+  req.params.ticker = req.params.ticker.toUpperCase();
+  try {
+    const position = await Position.findOne({
+      user: req.user.id,
+      ticker: req.params.ticker,
+    }).exec();
+
+    if (!position) {
+      return res
+        .status(404)
+        .json({ message: "User does not have a position for that stock" });
+    }
+
+    res.status(200).json({ position });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 exports.position_post = [
   body("ticker")
     .trim()
