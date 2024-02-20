@@ -8,6 +8,7 @@ require("./utils/auth");
 
 const indexRouter = require("./routes");
 const authRouter = require("./routes/authRouter");
+const portfolioRouter = require("./routes/portfolioRouter");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/api/auth/", authRouter);
+app.use("/api/portfolio/", portfolioRouter);
 app.use("/api", indexRouter);
 
 module.exports = app;

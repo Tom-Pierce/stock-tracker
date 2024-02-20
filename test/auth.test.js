@@ -1,11 +1,13 @@
 const request = require("supertest");
 const app = require("../app");
 const User = require("../models/User");
+const Position = require("../models/Position");
 
 describe("API tests", () => {
   beforeAll(async () => {
     // clear database from previous tests
     await User.deleteMany({}).exec();
+    await Position.deleteMany({}).exec();
   });
 
   it("should respond with 400 and errors if user email or password do not fit requirements", async () => {
