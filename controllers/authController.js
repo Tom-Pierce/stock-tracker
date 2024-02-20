@@ -83,6 +83,10 @@ exports.local_signup = [
             httpOnly: true,
             maxAge: maxAge * 1000,
           })
+          .cookie("refreshToken", user.refreshToken, {
+            withCredentials: true,
+            httpOnly: true,
+          })
           .status(201)
           .json({ message: "user created" });
       });
@@ -106,6 +110,13 @@ exports.local_login = (req, res, next) => {
         httpOnly: true,
         maxAge: maxAge * 1000,
       })
+      .cookie("refreshToken", user.refreshToken, {
+        withCredentials: true,
+        httpOnly: true,
+        // thirty days
+        maxAge: 60 * 60 * 24 * 30 * 1000,
+      })
+
       .sendStatus(200);
   })(req, res, next);
 };
