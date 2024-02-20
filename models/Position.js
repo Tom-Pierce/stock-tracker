@@ -16,18 +16,18 @@ const positionSchema = new Schema({
 // value of each seperate lot
 positionSchema
   .path("lots")
-  .schema.virtual("value")
+  .schema.virtual("cost")
   .get(function () {
     return this.quantity * this.price;
   });
 
 //value of position
-positionSchema.virtual("value").get(function () {
-  let totalValue = 0;
+positionSchema.virtual("cost").get(function () {
+  let totalCost = 0;
   this.lots.forEach((lot) => {
-    totalValue += lot.quantity * lot.price;
+    totalCost += lot.quantity * lot.price;
   });
-  return totalValue;
+  return totalCost;
 });
 
 positionSchema.set("toJSON", { virtuals: true });
