@@ -14,10 +14,11 @@ const app = express();
 main().catch((err) => console.log(err));
 
 async function main() {
-  const mongoDB =
-    process.env.NODE_ENV === "test" ? undefined : process.env.MONGODB_URI;
-
-  await mongoose.connect(mongoDB);
+  const mongoDB = process.env.MONGODB_URI;
+  if (process.env.NODE_ENV === "test") {
+  } else {
+    await mongoose.connect(mongoDB);
+  }
 }
 
 app.use(logger("dev"));
