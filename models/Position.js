@@ -30,6 +30,15 @@ positionSchema.virtual("cost").get(function () {
   return totalCost;
 });
 
+// total shares of a position
+positionSchema.virtual("quantity").get(function () {
+  let quantity = 0;
+  this.lots.forEach((lot) => {
+    quantity += lot.quantity;
+  });
+  return quantity;
+});
+
 positionSchema.set("toJSON", { virtuals: true });
 
 module.exports = mongoose.model("Position", positionSchema);

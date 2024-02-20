@@ -25,6 +25,13 @@ exports.position_get = async (req, res, next) => {
         .json({ message: "User does not have a position for that stock" });
     }
 
+    const res = await fetch(
+      `https://finnhub.io/api/v1/quote?symbol=${req.params.ticker}&token=${process.env.API_KEY}`,
+      { method: "GET" }
+    );
+
+    const stockData = await res.json();
+
     res.status(200).json({ position });
   } catch (err) {
     return next(err);
