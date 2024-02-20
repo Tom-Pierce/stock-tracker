@@ -7,7 +7,6 @@ const userSchema = new Schema({
   password: { type: String },
   refreshToken: { type: String },
   accountType: { type: String, required: true },
-  positions: [{ type: Schema.Types.ObjectId, ref: "Position" }],
 });
 
 userSchema.pre("save", function (next) {
