@@ -1,5 +1,5 @@
 const express = require("express");
-const verifyToken = require("../utils/verifyToken");
+const verifyToken = require("../middleware/verifyToken");
 const router = express.Router();
 
 router.get("/protected", verifyToken, (req, res, next) => {
