@@ -3,8 +3,19 @@ const Schema = mongoose.Schema;
 
 const positionSchema = new Schema({
   ticker: { type: String, required: true },
-  lots: [{ type: Schema.Types.ObjectId, ref: "Lot" }],
+  lots: [
+    {
+      quantity: { type: Number, required: true },
+      price: { type: Number, required: true },
+    },
+  ],
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 });
+
+positionSchema.virtual("lots.value").get(function () {
+  return this.quantity * this.price;
+});
+
+positionSchema.set("toJSON", { virtuals: true });
 
 module.exports = mongoose.model("Position", positionSchema);
