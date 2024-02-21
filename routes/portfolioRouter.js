@@ -11,7 +11,7 @@ portfolioRouter.post(
 );
 
 portfolioRouter.get(
-  "/position/:ticker/",
+  "/position/:ticker",
   verifyToken,
   positionController.position_get
 );
