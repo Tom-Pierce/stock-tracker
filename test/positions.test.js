@@ -80,7 +80,6 @@ describe("Positions tests", () => {
       .get("/api/portfolio/position/rklb")
       .set("Cookie", cookies);
 
-    console.log(res.body);
     expect(res.status).toEqual(200);
     expect(res.body.position).toMatchObject({
       ticker: "RKLB",
