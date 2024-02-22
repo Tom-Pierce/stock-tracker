@@ -21,14 +21,14 @@ positionSchema
   .path("lots")
   .schema.virtual("cost")
   .get(function () {
-    return this.quantity * this.price;
+    return Math.round(this.quantity * this.price * 100) / 100;
   });
 
 // cost of position
 positionSchema.virtual("cost").get(function () {
   let totalCost = 0;
   this.lots.forEach((lot) => {
-    totalCost += lot.quantity * lot.price;
+    totalCost += Math.round(lot.quantity * lot.price * 100) / 100;
   });
   return totalCost;
 });

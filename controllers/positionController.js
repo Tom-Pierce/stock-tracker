@@ -17,7 +17,7 @@ exports.positions_get = async (req, res, next) => {
 
         return {
           ...position.toObject(),
-          value: stockData.c * position.quantity,
+          value: Math.round(stockData.c * position.quantity * 100) / 100,
           currentPrice: stockData.c,
         };
       })
@@ -53,7 +53,7 @@ exports.position_get = async (req, res, next) => {
     res.status(200).send({
       position: {
         ...position.toObject(),
-        value: stockData.c * position.quantity,
+        value: Math.round(stockData.c * position.quantity * 100) / 100,
         currentPrice: stockData.c,
       },
     });
