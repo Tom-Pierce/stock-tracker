@@ -13,7 +13,7 @@ const verifyToken = (req, res, next) => {
   // if access token was sent
   if (req.cookies.jwt) {
     const token = req.cookies.jwt;
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, accessDecoded) => {
       if (err) {
         // return 401 error if token is invalid
         if (err.name !== "TokenExpiredError") {
@@ -30,7 +30,7 @@ const verifyToken = (req, res, next) => {
           jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET,
-            (err, decoded) => {
+            (err, refreshDecoded) => {
               if (err) {
                 return res.status(401).json({
                   message: "Authentication failed: Invalid refresh token",
@@ -39,14 +39,14 @@ const verifyToken = (req, res, next) => {
 
               // refresh token is valid, generate new access token
               const token = jwt.sign(
-                { _id: decoded._id },
+                { _id: refreshDecoded._id },
                 process.env.JWT_SECRET,
                 {
                   expiresIn: 60 * 60,
                 }
               );
 
-              req.user = { id: decoded._id };
+              req.user = { id: refreshDecoded._id };
               res.cookie("jwt", token, {
                 withCredentials: true,
                 httpOnly: true,
@@ -61,7 +61,7 @@ const verifyToken = (req, res, next) => {
 
       // if the refresh token is valid and an new access token has been generated, do not set user.id
       if (!err) {
-        req.user = { id: decoded._id };
+        req.user = { id: accessDecoded._id };
       }
       next();
     });
