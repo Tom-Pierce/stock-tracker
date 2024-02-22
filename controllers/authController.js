@@ -114,7 +114,7 @@ exports.local_login = (req, res, next) => {
         withCredentials: true,
         httpOnly: true,
         // thirty days
-        maxAge: process.env.REFRESH_TOKEN_MAX_AGE,
+        maxAge: process.env.REFRESH_TOKEN_MAX_AGE * 1000,
       })
 
       .sendStatus(200);
