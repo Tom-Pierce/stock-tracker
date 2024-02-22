@@ -52,8 +52,6 @@ const verifyToken = (req, res, next) => {
                 httpOnly: true,
                 maxAge: 60 * 60 * 1000,
               });
-
-              next();
             }
           );
         }
