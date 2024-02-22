@@ -3,7 +3,6 @@ const User = require("../models/User");
 const { body, validationResult } = require("express-validator");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const maxAge = 60 * 60;
 
 exports.local_signup = [
   body("email")
@@ -74,18 +73,19 @@ exports.local_signup = [
 
         await user.save();
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-          expiresIn: maxAge,
+          expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
         });
 
         res
           .cookie("jwt", token, {
             withCredentials: true,
             httpOnly: true,
-            maxAge: maxAge * 1000,
+            maxAge: process.env.ACCESS_TOKEN_MAX_AGE * 1000,
           })
           .cookie("refreshToken", user.refreshToken, {
             withCredentials: true,
             httpOnly: true,
+            maxAge: process.env.REFRESH_TOKEN_MAX_AGE * 1000,
           })
           .status(201)
           .json({ message: "user created" });
@@ -101,20 +101,20 @@ exports.local_login = (req, res, next) => {
     if (err) return next(err);
     if (!user) return res.status(401).send(info);
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: maxAge,
+      expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
     });
 
     res
       .cookie("jwt", token, {
         withCredentials: true,
         httpOnly: true,
-        maxAge: maxAge * 1000,
+        maxAge: process.env.ACCESS_TOKEN_MAX_AGE * 1000,
       })
       .cookie("refreshToken", user.refreshToken, {
         withCredentials: true,
         httpOnly: true,
         // thirty days
-        maxAge: 60 * 60 * 24 * 30 * 1000,
+        maxAge: process.env.REFRESH_TOKEN_MAX_AGE,
       })
 
       .sendStatus(200);
@@ -138,14 +138,14 @@ exports.refreshToken = (req, res, next) => {
           throw new Error("Authentication failed: Invalid token");
         }
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-          expiresIn: maxAge,
+          expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
         });
 
         res
           .cookie("jwt", token, {
             withCredentials: true,
             httpOnly: true,
-            maxAge: maxAge * 1000,
+            maxAge: process.env.ACCESS_TOKEN_MAX_AGE * 1000,
           })
           .sendStatus(200);
       } catch (err) {

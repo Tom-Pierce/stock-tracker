@@ -15,7 +15,7 @@ userSchema.pre("save", function (next) {
     process.env.REFRESH_TOKEN_SECRET,
     {
       // thirty days
-      expiresIn: 60 * 60 * 24 * 30,
+      expiresIn: process.env.REFRESH_TOKEN_MAX_AGE,
     }
   );
   next();

@@ -42,7 +42,7 @@ const verifyToken = (req, res, next) => {
                 { _id: refreshDecoded._id },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn: 60 * 60,
+                  expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
                 }
               );
 
@@ -50,7 +50,7 @@ const verifyToken = (req, res, next) => {
               res.cookie("jwt", token, {
                 withCredentials: true,
                 httpOnly: true,
-                maxAge: 60 * 60 * 1000,
+                maxAge: process.env.ACCESS_TOKEN_MAX_AGE * 1000,
               });
             }
           );
@@ -80,14 +80,14 @@ const verifyToken = (req, res, next) => {
 
         // refresh token is valid, generate new access token
         const token = jwt.sign({ _id: decoded._id }, process.env.JWT_SECRET, {
-          expiresIn: 60 * 60,
+          expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
         });
 
         req.user = { id: decoded._id };
         res.cookie("jwt", token, {
           withCredentials: true,
           httpOnly: true,
-          maxAge: 60 * 60 * 1000,
+          maxAge: process.env.ACCESS_TOKEN_MAX_AGE * 1000,
         });
 
         next();
