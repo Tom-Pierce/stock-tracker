@@ -8,7 +8,6 @@ const positionSchema = new Schema(
       {
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
-        _id: false,
       },
     ],
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
