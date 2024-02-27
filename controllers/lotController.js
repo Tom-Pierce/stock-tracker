@@ -52,3 +52,25 @@ exports.lot_post = [
     res.status(201).json({ message: "Lot added to position", position });
   },
 ];
+
+exports.lot_delete = async (req, res, next) => {
+  req.params.ticker = req.params.ticker.toUpperCase();
+
+  try {
+    const position = await Position.findOneAndUpdate(
+      {
+        user: req.user.id,
+        ticker: req.params.ticker,
+      },
+      { $pull: { lots: { _id: req.params.lotId } } },
+      { new: true }
+    );
+
+    if (position === null) {
+      return res.status(404).json({ message: "position not found" });
+    }
+    res.status(200).json({ message: "lot removed", position });
+  } catch (error) {
+    console.error(error);
+  }
+};

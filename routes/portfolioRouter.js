@@ -10,6 +10,12 @@ portfolioRouter.post(
   lotController.lot_post
 );
 
+portfolioRouter.delete(
+  "/position/:ticker/lot/:lotId",
+  verifyToken,
+  lotController.lot_delete
+);
+
 portfolioRouter.get(
   "/position/:ticker",
   verifyToken,

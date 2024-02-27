@@ -5,6 +5,7 @@ const Position = require("../models/Position");
 
 describe("Positions tests", () => {
   let cookies;
+  let lotId;
 
   beforeAll(async () => {
     // clear database from previous tests
@@ -38,6 +39,9 @@ describe("Positions tests", () => {
       })
       .set("Cookie", cookies);
 
+    // set lot id for removal test later
+    lotId = res.body.position.lots[0]._id;
+
     expect(res.status).toEqual(201);
     expect(res.body.message).toEqual("Lot added to position");
   });
@@ -55,5 +59,23 @@ describe("Positions tests", () => {
     expect(res.body.message).toEqual(
       "User does not have a position with that stock"
     );
+  });
+
+  it("should remove the specified lot", async () => {
+    const res = await request(app)
+      .delete(`/api/portfolio/position/rklb/lot/${lotId}`)
+      .set("Cookie", cookies);
+
+    expect(res.status).toEqual(200);
+    expect(res.body.message).toEqual("lot removed");
+  });
+
+  it("should not allow removal of a lot when the position does not exist", async () => {
+    const res = await request(app)
+      .delete(`/api/portfolio/position/aapl/lot/${lotId}`)
+      .set("Cookie", cookies);
+
+    expect(res.status).toEqual(404);
+    expect(res.body.message).toEqual("position not found");
   });
 });
