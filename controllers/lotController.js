@@ -17,7 +17,7 @@ exports.lot_post = [
     .isNumeric()
     .withMessage("Price must be numeric")
     .custom((value) => {
-      if (value <= 0) throw new Error("Quantity must be greater than 0");
+      if (value <= 0) throw new Error("Price must be greater than 0");
       return true;
     })
     .escape(),
