@@ -7,6 +7,7 @@ const userSchema = new Schema({
   password: { type: String },
   refreshToken: { type: String },
   accountType: { type: String, required: true },
+  invalidatedRefreshTokens: { type: Array, default: [] },
 });
 
 userSchema.pre("save", function (next) {

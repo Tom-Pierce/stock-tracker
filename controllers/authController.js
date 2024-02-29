@@ -97,11 +97,26 @@ exports.local_signup = [
 ];
 
 exports.local_login = (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("local", async (err, user, info) => {
     if (err) return next(err);
     if (!user) return res.status(401).send(info);
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
+    });
+
+    const refreshToken = jwt.sign(
+      { _id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        // thirty days
+        expiresIn: parseInt(process.env.REFRESH_TOKEN_MAX_AGE),
+      }
+    );
+
+    user.refreshToken = refreshToken;
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
     });
 
     res
@@ -119,6 +134,28 @@ exports.local_login = (req, res, next) => {
 
       .sendStatus(200);
   })(req, res, next);
+};
+
+exports.local_logout = async (req, res, next) => {
+  // remove refreshToken from user and add to invalidatedRefreshTokens
+  const userRefreshToken = await User.findById(req.user.id, "refreshToken");
+
+  const user = await User.findOneAndUpdate(
+    { _id: req.user.id },
+    {
+      $push: { invalidatedRefreshTokens: userRefreshToken.refreshToken },
+      $set: { refreshToken: "" },
+    },
+    { new: true }
+  ).exec();
+
+  if (user === null) {
+    return res
+      .status(500)
+      .json({ message: "logout unsuccessful, please try again" });
+  } else {
+    res.status(200).json({ message: "succesfully logged out" });
+  }
 };
 
 exports.refreshToken = (req, res, next) => {
