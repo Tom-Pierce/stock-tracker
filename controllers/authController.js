@@ -139,22 +139,20 @@ exports.local_login = (req, res, next) => {
 exports.local_logout = async (req, res, next) => {
   // remove refreshToken from user and add to invalidatedRefreshTokens
   const userRefreshToken = await User.findById(req.user.id, "refreshToken");
-
-  const user = await User.findOneAndUpdate(
-    { _id: req.user.id },
-    {
-      $push: { invalidatedRefreshTokens: userRefreshToken.refreshToken },
-      $set: { refreshToken: "" },
-    },
-    { new: true }
-  ).exec();
-
-  if (user === null) {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: req.user.id },
+      {
+        $push: { invalidatedRefreshTokens: userRefreshToken.refreshToken },
+        $set: { refreshToken: "" },
+      },
+      { new: true }
+    ).exec();
+    res.status(200).json({ message: "succesfully logged out" });
+  } catch (error) {
     return res
       .status(500)
       .json({ message: "logout unsuccessful, please try again" });
-  } else {
-    res.status(200).json({ message: "succesfully logged out" });
   }
 };
 
