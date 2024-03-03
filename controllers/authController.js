@@ -148,6 +148,8 @@ exports.local_logout = async (req, res, next) => {
       },
       { new: true }
     ).exec();
+    res.clearCookie("jwt");
+    res.clearCookie("refreshToken");
     res.status(200).json({ message: "succesfully logged out" });
   } catch (error) {
     return res
