@@ -101,7 +101,7 @@ exports.local_login = (req, res, next) => {
     if (err) return next(err);
     if (!user) return res.status(401).send(info);
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.ACCESS_TOKEN_MAX_AGE,
+      expiresIn: parseInt(5),
     });
 
     const refreshToken = jwt.sign(
